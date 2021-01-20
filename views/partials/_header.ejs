@@ -12,7 +12,7 @@
     </div>
     <%if (username) { %>
       <form class="form-inline" method="POST" action="/logout">
-        <label for="username">Logged In As: <%= username%>! </label>
+        <label for="username">Logged In As: <%= username.email %>! </label>
         <button type="submit" class="btn btn-primary">Logout</button>
       </form>
       <% } else { %>

@@ -20,24 +20,35 @@ const users = {
 }
 
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
+  // email: req.body.email,
+  // password: req.body.password
+  if(checkPassword(req.body.email, req.body.password)){
+    res.redirect("/urls");
+  } else {
+    res.send('incorrect email or password');
+  }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username', req.cookies["user_id"]);
+  res.clearCookie('user_id', req.cookies["user_id"]);
   res.redirect("/urls");
 });
 
 app.post("/register", (req, res) => {
   const id = generateRandomString();
-  users[id] = {
-    id: id,
-    email: req.body.email,
-    password: req.body.password
+  if(req.body.email === "" || req.body.password === ""){
+    res.sendStatus(400);
+  } else if(checkEmail(req.body.email)){
+    res.send('email already in use');
+  } else {
+    users[id] = {
+      id: id,
+      email: req.body.email,
+      password: req.body.password
+    }
+    res.cookie('user_id', id);
+    res.redirect("/urls");
   }
-  res.cookie('user_id', id);
-  res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
@@ -58,6 +69,10 @@ app.post("/urls/:shortURL", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("registration_page");
+});
+
+app.get("/login", (req, res) => {
+  res.render("login_page");
 });
 
 app.listen(PORT, () => {
@@ -85,3 +100,19 @@ app.get("/urls/:shortURL", (req, res) => {
 function generateRandomString() {
   return Math.floor((1 + Math.random()) * 0x100000).toString(16);
 };
+
+function checkEmail (email) {
+  for(let user in users){
+    if(email === users[user].email){
+      return true;
+    }
+  }
+}
+
+function checkPassword (email, password) {
+  for(let user in users){
+    if(email === users[user].email && password === users[user].password){
+      return true;
+    }
+  }
+}

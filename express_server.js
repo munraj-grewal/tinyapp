@@ -8,9 +8,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "user_id"},
+  "9sm5xK": {longURL: "http://www.google.ca", userID: "user_id"}
 };
+
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
@@ -54,7 +55,8 @@ app.post("/register", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const short = generateRandomString();
-  urlDatabase[short] = req.body.longURL;
+  urlDatabase[short] = {longURL: req.body.longURL, userID: req.cookies["user_id"]};
+  console.log(urlDatabase[short]);
   res.redirect("/urls");
 });
 
@@ -80,6 +82,15 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    res.sendStatus(404); 
+  } else {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  }
+});
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -90,7 +101,11 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", {user: users[req.cookies["user_id"]]});
+  if(req.cookies["user_id"]){
+    res.render("urls_new", {user: users[req.cookies["user_id"]]});
+  } else {
+    res.render("login_page", {user: false});
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -108,7 +123,7 @@ function checkEmail (email) {
       return true;
     }
   }
-}
+};
 
 function checkPassword (email, password) {
   for(let user in users){
@@ -117,4 +132,4 @@ function checkPassword (email, password) {
     }
   }
   return false
-}
+};

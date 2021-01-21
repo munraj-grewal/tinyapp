@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -12,13 +13,7 @@ const urlDatabase = {
   "9sm5xK": {longURL: "http://www.google.ca", userID: "user_id"}
 };
 
-const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  }
-}
+const users = {}
 
 app.post("/login", (req, res) => {
   const user = checkPassword(req.body.email, req.body.password);
@@ -46,7 +41,7 @@ app.post("/register", (req, res) => {
     users[id] = {
       id: id,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     }
     res.cookie('user_id', id);
     res.redirect("/urls");
@@ -130,7 +125,7 @@ function checkEmail (email) {
 
 function checkPassword (email, password) {
   for(let user in users){
-    if(email === users[user].email && password === users[user].password){
+    if(email === users[user].email && bcrypt.compareSync(password, users[user].password)){
       return user;
     }
   }

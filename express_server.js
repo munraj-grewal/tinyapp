@@ -31,7 +31,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id', req.cookies["user_id"]);
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.post("/register", (req, res) => {
@@ -84,16 +84,16 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const urls = {urls: urlDatabase, username: users[req.cookies["user_id"]]}
+  const urls = {urls: urlDatabase, user: users[req.cookies["user_id"]]}
   res.render("urls_index", urls);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", {username: users[req.cookies["user_id"]]});
+  res.render("urls_new", {user: users[req.cookies["user_id"]]});
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL],  username: users[req.cookies["user_id"]] }
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL],  user: users[req.cookies["user_id"]] }
   res.render("urls_show", templateVars);
 });
 

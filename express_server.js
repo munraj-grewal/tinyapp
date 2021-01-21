@@ -36,6 +36,7 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const id = generateRandomString();
+  let user;
   if(req.body.email === "" || req.body.password === ""){
     res.sendStatus(400);
   } else if(checkEmail(req.body.email)){
@@ -68,11 +69,11 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("registration_page");
+  res.render("registration_page", {user: false});
 });
 
 app.get("/login", (req, res) => {
-  res.render("login_page");
+  res.render("login_page", {user: false});
 });
 
 app.listen(PORT, () => {

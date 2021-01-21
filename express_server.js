@@ -20,12 +20,12 @@ const users = {
 }
 
 app.post("/login", (req, res) => {
-  // email: req.body.email,
-  // password: req.body.password
-  if(checkPassword(req.body.email, req.body.password)){
-    res.redirect("/urls");
-  } else {
+  const user = checkPassword(req.body.email, req.body.password);
+  if(user === false){
     res.send('incorrect email or password');
+  } else {
+    res.cookie('user_id', user);
+    res.redirect("/urls");
   }
 });
 
@@ -112,7 +112,8 @@ function checkEmail (email) {
 function checkPassword (email, password) {
   for(let user in users){
     if(email === users[user].email && password === users[user].password){
-      return true;
+      return user;
     }
   }
+  return false
 }

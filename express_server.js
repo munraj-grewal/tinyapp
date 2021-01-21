@@ -56,7 +56,6 @@ app.post("/register", (req, res) => {
 app.post("/urls", (req, res) => {
   const short = generateRandomString();
   urlDatabase[short] = {longURL: req.body.longURL, userID: req.cookies["user_id"]};
-  console.log(urlDatabase[short]);
   res.redirect("/urls");
 });
 
@@ -96,7 +95,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const urls = {urls: urlDatabase, user: users[req.cookies["user_id"]]}
+  const urls = {urls: urlsForUser(req.cookies["user_id"]), user: users[req.cookies["user_id"]]}
   res.render("urls_index", urls);
 });
 
@@ -133,3 +132,13 @@ function checkPassword (email, password) {
   }
   return false
 };
+
+function urlsForUser(id) {
+  let returnOBJ = {};
+  for (let url in urlDatabase){
+    if(id === urlDatabase[url].userID) {
+      returnOBJ[url] = urlDatabase[url];
+    }
+  }
+  return returnOBJ;
+}

@@ -5,8 +5,15 @@ const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['secret keys', 'key'],
+
+}))
+
 
 const urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "user_id"},
@@ -15,12 +22,13 @@ const urlDatabase = {
 
 const users = {}
 
+
 app.post("/login", (req, res) => {
   const user = checkPassword(req.body.email, req.body.password);
   if(user === false){
     res.send('incorrect email or password');
   } else {
-    res.cookie('user_id', user);
+    req.session.user_id = user;
     res.redirect("/urls");
   }
 });
@@ -43,7 +51,7 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10)
     }
-    res.cookie('user_id', id);
+    req.session.user_id = id;
     res.redirect("/urls");
   }
 });
@@ -55,7 +63,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if(req.cookies["user_id"]){
+  if(req.session.user_id){
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   } else {
@@ -94,22 +102,25 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const urls = {urls: urlsForUser(req.cookies["user_id"]), user: users[req.cookies["user_id"]]}
+  
+  const urls = {urls: urlsForUser(req.session.user_id), user: users[req.session.user_id]}
   res.render("urls_index", urls);
 });
 
 app.get("/urls/new", (req, res) => {
-  if(req.cookies["user_id"]){
-    res.render("urls_new", {user: users[req.cookies["user_id"]]});
+  if(req.session.user_id){
+    res.render("urls_new", {user: users[req.session.user_id]});
   } else {
     res.render("login_page", {user: false});
   }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL],  user: users[req.cookies["user_id"]] }
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL],  user: users[req.session.user_id] }
   res.render("urls_show", templateVars);
 });
+
+
 
 function generateRandomString() {
   return Math.floor((1 + Math.random()) * 0x100000).toString(16);

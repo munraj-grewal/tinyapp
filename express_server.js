@@ -58,7 +58,7 @@ app.post("/register", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const short = generateRandomString();
-  urlDatabase[short] = {longURL: req.body.longURL, userID: req.cookies["user_id"]};
+  urlDatabase[short] = {longURL: req.body.longURL, userID: req.session.user_id};
   res.redirect("/urls");
 });
 

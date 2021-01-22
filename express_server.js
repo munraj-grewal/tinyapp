@@ -16,11 +16,7 @@ app.use(cookieSession({
 }))
 
 const users = {};
-
-const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "user_id"},
-  "9sm5xK": {longURL: "http://www.google.ca", userID: "user_id"}
-};
+const urlDatabase = {};
 
 app.post("/login", (req, res) => {
   const user = getUserByEmail(req.body.email, users);

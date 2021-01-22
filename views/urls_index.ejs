@@ -10,8 +10,10 @@
 </head>
 
 <body>
+  <!-- puts in header -->
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
+    <!-- checks login status -->
     <%if (user) { %>
     <h3>My URLs</h3>
     <table class="table">
@@ -24,6 +26,7 @@
         </tr>
       </thead>
       <tbody>
+        <!-- displays users urls -->
         <% for(let url in urls) { %>
           <tr>
             <td><a href="/u/<%= url %>"><%= url %></a></td>

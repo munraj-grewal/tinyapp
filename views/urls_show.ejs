@@ -7,9 +7,12 @@
 </head>
 
 <body>
+  <!-- puts in header -->
   <%- include('partials/_header') %>
+  <!-- check if correct user-->
   <%if (user.id !== longURL.userID) { %>
     <h1>Please Log In With The Correct Account</h1>
+  <!-- check if logged in -->
   <% } else if (!user) { %>
     <h1>Please Log In</h1>
   <% } else { %>

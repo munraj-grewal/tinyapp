@@ -2,15 +2,13 @@ const {generateRandomString} = require("./helpers");
 const {getUserByEmail} = require("./helpers");
 const {urlsForUser} = require("./helpers");
 const express = require("express");
+const bcrypt = require('bcrypt');
+const bodyParser = require("body-parser");
+const cookieSession = require("cookie-session");
 const app = express();
 const PORT = 8080;
-const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const cookieSession = require("cookie-session");
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['secret keys', 'key'],
@@ -26,7 +24,6 @@ const urlDatabase = {
 
 app.post("/login", (req, res) => {
   const user = getUserByEmail(req.body.email, users);
-  console.log(user);
   if(user === false){
     res.send('incorrect email or password');
   } else if(!bcrypt.compareSync(req.body.password, user.password)){
@@ -38,7 +35,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id', req.cookies["user_id"]);
+  req.session = null;
   res.redirect("/login");
 });
 

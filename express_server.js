@@ -76,16 +76,21 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/", (req, res) => {
+  if(req.session.user_id){
+    const urls = {urls: urlsForUser(req.session.user_id, urlDatabase), user: users[req.session.user_id]}
+  res.render("urls_index", urls);
+  } else {
+    res.render("login_page", {user: false});
+  }
+});
+
 app.get("/register", (req, res) => {
   res.render("registration_page", {user: false});
 });
 
 app.get("/login", (req, res) => {
   res.render("login_page", {user: false});
-});
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -97,12 +102,7 @@ app.get("/u/:shortURL", (req, res) => {
   }
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
 app.get("/urls", (req, res) => {
-  
   const urls = {urls: urlsForUser(req.session.user_id, urlDatabase), user: users[req.session.user_id]}
   res.render("urls_index", urls);
 });
@@ -118,4 +118,8 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL],  user: users[req.session.user_id] }
   res.render("urls_show", templateVars);
+});
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
